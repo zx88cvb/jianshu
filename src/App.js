@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
-import { GlobalStyle } from './style'
-import { IconStyle } from './statics/iconfont/iconfont'
-import Header from './common/header'
+import { Provider } from 'react-redux';
+import store from './store';
+import { GlobalStyle } from './style';
+import { IconStyle } from './statics/iconfont/iconfont';
+import Header from './common/header';
 
 class App extends Component {
   render() {
     return (
-      <div>
+      <Provider store={store}>
         <GlobalStyle />
         <IconStyle />
         <Header />
-      </div>
+      </Provider>
     );
   }
 }
