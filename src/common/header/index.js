@@ -22,21 +22,34 @@ import {
 class Header extends Component {
 
   getListArea () {
-    const { focused, list } = this.props;
-    if (focused) {
+    const { focused, mouseIn, list, page, totalPage, handleMouseEnter, handleMouseLeave, handleChangePage } = this.props;
+    const pageList = [];
+    // immutable 转换 普通
+    const newList = list.toJS();
+
+    if (newList.length) {
+      for (let i = (page - 1) * 10; i < page * 10; i++) {
+        pageList.push(
+          <SearchInfoItem key={newList[i]}>{newList[i]}</SearchInfoItem>
+        );
+      }
+    }
+
+    if (focused || mouseIn) {
       return (
-        <SearchInfo>
+        <SearchInfo
+         onMouseEnter={handleMouseEnter}
+         onMouseLeave={handleMouseLeave}>
           <SearchInfoTitle>
             热门搜索
-            <SearchInfoSwitch>换一批</SearchInfoSwitch>
+            <SearchInfoSwitch
+             onClick={() => handleChangePage(page, totalPage, this.spinIcon)}>
+             <i ref={(icon) => {this.spinIcon = icon}} className="iconfont spin">&#xe851;</i>
+             换一批
+            </SearchInfoSwitch>
           </SearchInfoTitle>
           <SearchInfoList>
-            {
-              list.map((item) => {
-                return <SearchInfoItem key={item}>{item}</SearchInfoItem>
-              })
-            }
-            
+            {pageList}       
           </SearchInfoList>
         </SearchInfo>
       )
@@ -46,7 +59,7 @@ class Header extends Component {
   }
 
   render () {
-    const { focused, handleInputFocus, handleInputBlur } = this.props;
+    const { focused, handleInputFocus, handleInputBlur, list } = this.props;
     return (
       <HeaderWrapper>
         <WidthLimit>
@@ -64,11 +77,11 @@ class Header extends Component {
                 timeout={300}
                 classNames="slide">
                 <NavSearch className={focused ? 'focused' : ''}
-                  onFocus={handleInputFocus}
+                  onFocus={() => handleInputFocus(list)}
                   onBlur={handleInputBlur}>
                 </NavSearch>
               </CSSTransition>
-              <span className={focused ? 'focused iconfont' : 'iconfont'}>&#xe64d;</span>
+              <span className={focused ? 'focused iconfont zoom' : 'iconfont zoom'}>&#xe64d;</span>
               {this.getListArea()}
             </SearchWrapper>
           </Nav>
@@ -85,20 +98,46 @@ class Header extends Component {
 const mapStateTothis = (state) => {
   return {
     focused: state.getIn(['header', 'focused']),
-    list: state.getIn(['header', 'list'])
+    mouseIn: state.getIn(['header', 'mouseIn']),
+    list: state.getIn(['header', 'list']),
+    page: state.getIn(['header', 'page']),
+    totalPage: state.getIn(['header', 'totalPage'])
   }
 }
 
 const mapDispathTothis = (dispath) => {
   return {
-    handleInputFocus () {
-      dispath(actionCreators.getList());
+    handleInputFocus (list) {
+      if (list.size === 0) {
+        dispath(actionCreators.getList());
+      }
       const action = actionCreators.searchFocus();
       dispath(action);
     },
     handleInputBlur () {
       const action = actionCreators.searchBlur()
       dispath(action);
+    },
+    handleMouseEnter () {
+      dispath(actionCreators.mouseEnter());
+    },
+    handleMouseLeave () {
+      dispath(actionCreators.mouseLeave());
+    },
+    handleChangePage (page, totalPage, spin) {
+      let originAngle = spin.style.transform.replace(/[^0-9]/ig, '');
+      if (originAngle) {
+        originAngle = parseInt(originAngle, 10);
+      } else {
+        originAngle = 0;
+      }
+      spin.style.transform = 'rotate('+ (originAngle + 360) +'deg)';
+      
+      if (page < totalPage) {
+        dispath(actionCreators.changePage(page + 1));
+      } else {
+        dispath(actionCreators.changePage(1));
+      }
     }
   }
 }
