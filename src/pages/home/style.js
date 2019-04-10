@@ -80,6 +80,18 @@ export const ListInfo = styled.div`
   }
 `;
 
+export const LoadMore = styled.div`
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  margin: 30px 0;
+  text-align: center;
+  border-radius: 20px;
+  color: #fff;
+  background: #a5a5a5;
+  cursor: pointer;
+`;
+
 export const RecommendWrapper = styled.div`
   margin: 30px 0;
   width: 280px;
@@ -90,4 +102,16 @@ export const RecommendItem = styled.div`
   height: 50px;
   background: url(${(props) => props.imgUrl});
   background-size: contain;
+`;
+
+export const BackTop = styled.div`
+  position: fixed;
+  right: 100px;
+  bottom: 100px;
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
+  border: 1px solid #ccc;
+  text-align: center;
+  font-size: 14px;
 `;
